@@ -1,7 +1,7 @@
 ---
 title: "Basic Machine Learning  - Regression (Part 1)"
 date: 2017-09-19T16:53:44-07:00
-draft: true
+draft: false
 type: "page"
 ---
 
