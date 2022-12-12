@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{{ partial "head.html" . }}
+	<link rel="stylesheet" type="text/css" href="/css/code.css">
+	<script type="text/javascript" src="https://blog.apbytes.com/js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	<script>
+	  MathJax = {
+	    tex: {
+	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+	      displayMath: [['$$','$$'], ['\\[', '\\]']],
+	      processEscapes: true,
+	      processEnvironments: true
+	    },
+	    options: {
+	      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+	    }
+	  };
+
+	  window.addEventListener('load', (event) => {
+	      document.querySelectorAll("mjx-container").forEach(function(x){
+	        x.parentElement.classList += 'has-jax'})
+	    });
+
+	</script>
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+	{{ partial "navbar.html" . }}
+	
+	<div class="blog-head blogBanner">
+		<h1 class="blog-title">{{ .Title }}</h1>
+		<h5 class="blog-date">
+			Posted <span class="catchDate">{{ .Date | time.Format ":date_long" }}</span>
+		</h5>
+	</div>
+	<div class="container">
+		<div class="blog-reader-container">
+			<div class="blog-content">
+				{{ .Content }}
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

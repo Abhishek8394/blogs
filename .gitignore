@@ -1,1 +1,3 @@
 hugo.exe
+blog/public/
+.hugo_build.lock
