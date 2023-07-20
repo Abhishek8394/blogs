@@ -6,34 +6,12 @@
 <body>
 	{{ partial "navbar.html" . }}
 	<div class="container">
-		<div id="noBlogs" style="display:none;opacity:0" class="noBlogs ">
-			<div class="blogCard">
-				<h1 class="display-3">
-					Cool stuff coming soon.
-				</h1>
-				<h3 class="display-3"> But here's a parting gift<h3>
-				<br><br>
-				<h3 class="display-3">
-					Well begun is half done. - Aristotle					
-				</h3>
-				<div class="lead" onclick="window.location='http://www.apbytes.com';" style="cursor:pointer">
-					Check<a href="http://www.apbytes.com"> <u><i>this</i></u> </a>out while you are at it
-				</div>
+		{{ if (not .Pages) }}
+			<div id="noBlogs" style="display:block;opacity:1" class="noBlogs ">
+				{{ partial "parting_gift.html" (dict "context" . "isEmptyList" true ) }}
 			</div>
-		</div>
-
-		
-
-		<!-- <div id="loading">
-			<div class="showbox">
-			  <div class="loader">
-			    <svg class="circular" viewBox="25 25 50 50">
-			      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-			    </svg>
-			  </div>
-			</div>
-		</div>  -->
-		<div id="blogsContainer" class="blogsContainer">
+		{{ else }}
+			<div id="blogsContainer" class="blogsContainer">
 			<!-- Ranges through content/posts/*.md -->
 		    {{ range .Pages  }}
 				<div class="blogCard jumbotron singleCard" style="">
@@ -42,14 +20,19 @@
 			        	<h1 class="display-3">
 				            <a href="{{.Permalink}}">{{.Title}}</a>
 			            </h1>
-			            <div class="date lead">{{.Date | time.Format ":date_long" }}</div>
+			            <div class="date lead">{{.Date | time.Format ":date_long" }}</div>						
 			        </div>
 			    </div>
-		    {{ end }}
-
+		    {{ end }}			
 		</div>
+		<div class="oneBlog" style="display: block">
+			{{ partial "parting_gift.html" (dict "context" . "isEmptyList" false ) }}    
+		</div>
+		{{ end }}
+
+		
 	</div>
-	
+	<!-- TODO: Random Quote panel -->
 
 	<!-- Scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js"></script>
