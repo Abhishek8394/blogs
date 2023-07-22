@@ -59,7 +59,7 @@ jobs:
           cd blog && hugo \
             --gc \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"          
+            --baseURL "https://blog.apbytes.com"
       - name: Commit gh-pages
         run: |
           git config --global user.name "${GITHUB_ACTOR:=gh-ci}" && \
