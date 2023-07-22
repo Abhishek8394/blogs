@@ -65,7 +65,8 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR:=gh-ci}" && \
           git config --global user.email "abhishek8394@users.noreply.github.com" && \
             mv ./blog/public ./tmp && rm -rf blog .gitignore && \
-            git fetch origin gh-pages && git checkout gh-pages && mv tmp/* . && rm -rf tmp \
+            git fetch origin gh-pages && git checkout gh-pages && mv tmp/* . && \
+            rm -rf ./tmp && \
             git add . && git commit -m "[skip ci] update gh-pages" && \
             git push -u origin gh-pages
 
