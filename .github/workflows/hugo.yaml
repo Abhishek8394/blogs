@@ -67,7 +67,8 @@ jobs:
             mv ./blog/public ./tmp && rm -rf blog .gitignore && \
             git fetch origin gh-pages && git checkout gh-pages && cp -av tmp/* . && \
             rm -rf ./tmp && \
-            git add . && git commit -m "update gh-pages" && \
+            git add . && \
+            (git diff-index --quiet HEAD || git commit -m git commit -m "update gh-pages") && \
             git push -u origin gh-pages
 
       # - name: Upload artifact
