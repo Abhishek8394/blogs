@@ -14,7 +14,7 @@
 			<div id="blogsContainer" class="blogsContainer">
 			<!-- Ranges through content/posts/*.md -->
 		    {{ range .Pages  }}
-				<div class="blogCard jumbotron singleCard" style="">
+				<div class="blogCard jumbotron singleCard" style="{{ if (.Params.card_background) }} background: {{.Params.card_background}} {{ end }}">
 			    
 			        <div class="content-wrapper">
 			        	<h1 class="display-3">

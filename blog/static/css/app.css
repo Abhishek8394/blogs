@@ -6231,7 +6231,7 @@ label,
 .checkbox label {
   font-weight: 300;
 }
-pre > code > span{
+pre > code{
   padding-left: 1%;
   padding-right: 1%;
 }
