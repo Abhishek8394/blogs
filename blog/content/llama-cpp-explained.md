@@ -402,7 +402,7 @@ static std::string llama_format_tensor_shape(const std::vector<uint32_t> & ne) {
 }
 ```
 
-Below is an interesting function. At a glance, it seems to return the size of a tensor. It uses the tensor shape `ne` and tensor type `enum ggml_type type` to calculate size. Glance at the snippet and see if you spot something interesting.
+Below is an interesting function. It returns the number of bytes used by a tensor. It uses the tensor shape `ne` and tensor type `enum ggml_type type` to calculate size. Glance at the snippet and see if you spot something interesting.
 
 ```c++
 static size_t llama_calc_tensor_size(const std::vector<uint32_t> & ne, enum ggml_type type) {
@@ -429,6 +429,8 @@ As mentioned in previous point, GGML packs `32` numbers in a quantization block 
 ```
 (tensor shape * block size in bytes) / # of elements per block
 ```
+
+And so the function returns **number of bytes used by tensor!**
 
 You can refer to [quantization](#quantization) for more details.
 
