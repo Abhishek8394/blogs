@@ -358,3 +358,95 @@ struct llama_kv_cache {
     }
 };
 ```
+
+## Utility functions
+```c++
+/**
+ * Multiplication that checks for value overflow.
+ * This is easily checked by checking that  `(a * b) / a`  is equal to `b` or not.
+ * If it is not equal to `b` then an overflow had occurred.
+ */
+template <typename T>
+static T checked_mul(T a, T b) {
+    T ret = a * b;
+    if (a != 0 && ret / a != b) {
+        throw std::runtime_error(format("overflow multiplying %llu * %llu",
+                     (unsigned long long) a, (unsigned long long) b));
+    }
+    return ret;
+}
+
+/**
+ * Division operation check for divide by 0.
+ */
+static size_t checked_div(size_t a, size_t b) {
+    if (b == 0 || a % b != 0) {
+        throw std::runtime_error(format("error dividing %zu / %zu", a, b));
+    }
+    return a / b;
+}
+
+/**
+ * Utility to get the shape of a tensor as a pretty string. 
+ * GGML tensors have a property `ne` that is number of elements in each dimension.
+ * @param  ne `ne` attribute of tensor.
+ * @return    Formatted shape string.
+ */
+static std::string llama_format_tensor_shape(const std::vector<uint32_t> & ne) {
+    char buf[256];
+    snprintf(buf, sizeof(buf), "%5u", ne.at(0));
+    for (size_t i = 1; i < ne.size(); i++) {
+        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), " x %5u", ne.at(i));
+    }
+    return buf;
+}
+```
+
+Below is an interesting function. At a glance, it seems to return the size of a tensor. It uses the tensor shape `ne` and tensor type `enum ggml_type type` to calculate size. Glance at the snippet and see if you spot something interesting.
+
+```c++
+static size_t llama_calc_tensor_size(const std::vector<uint32_t> & ne, enum ggml_type type) {
+    size_t size = ggml_type_size(type);
+    for (uint32_t dim : ne) {
+        size = checked_mul<size_t>(size, dim);
+    }
+    return size / ggml_blck_size(type);
+}
+```
+
+Two gotchas here!
+
+1. `ggml_type_size` might not return what you expect. What do you think will it return for `f32` and `q4_0`? For `f32` it returns the system's float size `sizeof(float)`. Let's say it is `4` bytes. Then what do you think will `q4_0` size will be? Hmmm.. 4 bit quantization, so we can pack two parameters in a byte. So per parameter should be 0.5? Can't  return float for size in bytes though. It actually returns `18` bytes. This is because ggml packs `32` q4_0 numbers in a single block `struct block_q4_0`. Size of this struct is `18` bytes and hence this takes us to our second gotcha.
+
+2. What is up with `size / ggml_blck_size(type)`. And even crazier, `ggml_blck_size` returns `1` for `float16` and `float32`. And returns `32` for other quant types (4, 5, 8). So what is this function returning?
+
+- If tensor type if `f16` or `f32`, return `# of bytes`.
+
+- If tensor type is one of `q4, q5, q8`, return `(# of bytes / 32)`.
+
+As mentioned in previous point, GGML packs `32` numbers in a quantization block (e.g. `struct block_q4_0`). So what it does is
+
+```
+(tensor shape * block size in bytes) / # of elements per block
+```
+
+You can refer to [quantization](#quantization) for more details.
+
+## Quantization
+
+### How are quantized bits stored? Let's dive in!
+
+#### Q4_0
+```c++
+#define QK4_0 32
+typedef struct {
+    ggml_fp16_t d;          // delta
+    uint8_t qs[QK4_0 / 2];  // nibbles / quants
+} block_q4_0;
+static_assert(sizeof(block_q4_0) == sizeof(ggml_fp16_t) + QK4_0 / 2, "wrong q4_0 block size/padding");
+```
+You can also read the following [issue](https://github.com/ggerganov/llama.cpp/issues/1241) to get more context.
+
+
+
+
