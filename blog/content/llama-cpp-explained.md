@@ -426,8 +426,8 @@ Two gotchas here!
 
 As mentioned in previous point, GGML packs `32` numbers in a quantization block (e.g. `struct block_q4_0`). So what it does is
 
-```
-(tensor shape * block size in bytes) / # of elements per block
+```python
+(tensor_shape * block_size_in_bytes) / num_of_elements_per_block
 ```
 
 And so the function returns **number of bytes used by tensor!**
@@ -450,5 +450,20 @@ static_assert(sizeof(block_q4_0) == sizeof(ggml_fp16_t) + QK4_0 / 2, "wrong q4_0
 You can also read the following [issue](https://github.com/ggerganov/llama.cpp/issues/1241) to get more context.
 
 
+## Model IO
 
+Ok so how does llama.cpp model format work and loading from files work? Let's start off with our first struct `llama_load_tensor`.
+TODO
+
+```c++
+struct llama_load_tensor {
+    std::string name;
+    enum ggml_type type = GGML_TYPE_F32;
+    std::vector<uint32_t> ne;
+    size_t file_off;
+    size_t size;
+    struct ggml_tensor * ggml_tensor = NULL;
+    uint8_t * data;
+};
+```
 
